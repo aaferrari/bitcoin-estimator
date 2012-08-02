@@ -1,16 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
-
-<!-- Pendiente de implementar:
-Si dividis la cantidad de bloques que faltan generarse (1486) por la cantidad de bloques que se generan por hora (8.68) te da el numero de horas que falta para el cambio de dificultad. Dividi eso por 24 y sacas los dias:
-
-1486/8.68 = 171,198/24 = 7.13 dias (sabado que viene, como bien dije antes)
-
-Y si miras bien ahi te dice de cuanto es estimativamente la dificultad proxima.
-El dato anterior proviene de algun lugar de http://foros.3dgames.com.ar/bitcoin.396/695720.mercado-cambiario-sube-baja-compro-vendo.11.html
-
--->
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Calculadora Bitconiana</title></head><body>http://www.hscripts.com/tutorials/javascript/string-float.php
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Calculadora Bitconiana</title></head><body>
   <script type="text/javascript">
 
 function formatTime(timeValue, format) {
@@ -61,6 +51,7 @@ function formateador(numero) {
 			}
 
 function calculador() {
+  //En http://www.hscripts.com/tutorials/javascript/string-float.php se encuentra un interesante articulo sobre el parseo de numeros y cadenas en Javascript
 	var bloques = parseInt(document.getElementById("txtExistencia").value);
 	var intervalo = parseFloat(document.getElementById("txtTiempo").value);
 	var costo_inicial = parseFloat(document.getElementById("txtCosto").value);
