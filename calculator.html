@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
 
 <!-- Pendiente de implementar:
@@ -16,7 +17,7 @@ function formatTime(timeValue, format) {
     // Funcion tomada integramente de http://blog.jmacoe.com/programacion/web_developer/javascript-formato-la-hora/
     var fmt = format.toUpperCase();
     var re = /^(H|HH)(:MM)(:SS)?( AM)?$/;
-    if (!re.test(fmt)) { fmt = "H:MM AM";
+    if (!re.test(fmt)) { fmt = "H:MM AM"; }
     var MM = "0" + (timeValue.getMinutes());
     MM = MM.substring(MM.length-2, MM.length);
     var SS = "0" + (timeValue.getSeconds());
@@ -64,36 +65,46 @@ function calculador() {
 	var intervalo = parseFloat(document.getElementById("txtTiempo").value);
 	var costo_inicial = parseFloat(document.getElementById("txtCosto").value);
 	var tabla = document.getElementById("tblEstimaciones");
-	//tabla.deleteRow(0)
 	var filas = tabla.rows;
 	var fecha_actual = new Date();
 	var fecha_futura = new Date();
-	/* Borro el primer elemento de la lista ya que seria la cabecera de la tabla.
-	 * Esta manera de hacerlo la vi en http://wolfram.kriesing.de/blog/index.php/2008/javascript-remove-element-from-array
-	 */
-	//filas.splice(0,0);
 	//Los siguientes arrays se usaran para formatear la fecha futura con una de las formas que aparecen en http://www.desarrolloweb.com/articulos/mostrar-fecha-actual-javascript.html
 	var meses = new Array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
 	var diasSemana = new Array("Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado");
 	var total_bloques = 0; //210000 es la cantidad de bloques que se crean cada vez segun dice en .......
 	var dinero_total = 0.0;
-	//Esta forma alternativa de hacer el for la encontre en http://gespadas.com/manejo-basico-de-arreglos-en-javascript
-	for (var fila = 1, longitud = filas.length; fila < longitud; fila++) {
-		if (fila == 1){
-			total_bloques = 210000;
-		}
-		else {
-			total_bloques = total_bloques + 210000;
+	//Eliminanos las filas previas (si hay) antes de empezar a rellenar la tabla
+	for (var registro = 1, longitud = filas.length; registro < longitud; registro++) {
+	  tabla.deleteRow(registro);
+	  }
+	while (1) {
+		total_bloques = total_bloques + 210000;
+		if (total_bloques > 210000) {
 			costo_inicial = costo_inicial / 2;//El costo disminuye la mitad despues de que se crean 210000 bloques
-  		}
+  	  }
 		dinero_total = dinero_total + (costo_inicial * 210000);
-		var campos = filas[fila].cells;
 		fecha_futura.setTime((((intervalo * 60) * (total_bloques - bloques)) * 1000) + fecha_actual.getTime());
-		campos[0].innerHTML = diasSemana[fecha_futura.getDay()] + ", " + fecha_futura.getDate() + " de " + meses[fecha_futura.getMonth()] + " de " + fecha_futura.getFullYear() + " a las " + formatTime(fecha_futura, "H:MM:SS");
-		campos[1].innerHTML = total_bloques;
-		campos[2].innerHTML = formateador(costo_inicial);
-		campos[3].innerHTML = formateador(costo_inicial * 210000) + " BTC";
-		campos[4].innerHTML = dinero_total + " BTC";
+		//Agregamos las filas dinamicamente, gracias a http://www.lawebdelprogramador.com/foros/DHTML/818520-anadir_fila_en_una_tabla.html por el procedimiento
+    var cuerpo_tabla = document.getElementById("tblEstimaciones").getElementsByTagName("TBODY")[0];
+    var fila = document.createElement("TR");
+    var campo1 = document.createElement("TD");
+    campo1.appendChild(document.createTextNode(diasSemana[fecha_futura.getDay()] + ", " + fecha_futura.getDate() + " de " + meses[fecha_futura.getMonth()] + " de " + fecha_futura.getFullYear() + " a las " + formatTime(fecha_futura, "H:MM:SS")));
+    fila.appendChild(campo1);
+    var campo2 = document.createElement("TD");
+    campo2.appendChild(document.createTextNode(total_bloques));
+    fila.appendChild(campo2);
+    var campo3 = document.createElement("TD");
+    campo3.appendChild(document.createTextNode(formateador(costo_inicial)));
+    fila.appendChild(campo3);
+    var campo4 = document.createElement("TD");
+    campo4.appendChild(document.createTextNode(formateador(costo_inicial * 210000) + " BTC"));
+    fila.appendChild(campo4);
+    var campo5 = document.createElement("TD");
+    campo5.appendChild(document.createTextNode(dinero_total + " BTC"));
+    fila.appendChild(campo5);
+    cuerpo_tabla.appendChild(fila);
+    if (dinero_total >= 21000000.0 || costo_inicial == 0.0) {
+     break; }
 	};
 }
   </script>
@@ -109,9 +120,9 @@ crear un nuevo bloque (en minutos) </td>
       <td style="vertical-align: top; width: 168px;">Costo actual </td>
     </tr>
     <tr>
-      <td style="vertical-align: top; width: 135px;"><input onkeypress="calculador()" id="txtExistencia" value="1"> </td>
+      <td style="vertical-align: top; width: 135px;"><input onkeypress="calculador()" id="txtExistencia" value="100000"> </td>
       <td style="vertical-align: top; width: 168px;"><input onkeypress="calculador()" id="txtTiempo" value="1"> </td>
-      <td style="vertical-align: top; width: 168px;"><input onkeypress="calculador()" value="1" id="txtCosto"> </td>
+      <td style="vertical-align: top; width: 168px;"><input onkeypress="calculador()" value="50" id="txtCosto"> </td>
     </tr>
   </tbody>
 </table>
@@ -121,655 +132,19 @@ crear un nuevo bloque (en minutos) </td>
 <table style="text-align: left; width: 1000px; height: 172px;" id="tblEstimaciones" border="1" cellpadding="2" cellspacing="2">
 
   <tbody>
-    <tr>
-      <td style="vertical-align: top; width: 310px;">Fecha limite<br>
-      </td>
-      <td style="vertical-align: top; width: 159px;">Cantidad total de
+    <thead>
+      <th style="vertical-align: top; width: 310px;">Fecha limite<br>
+      </th>
+      <th style="vertical-align: top; width: 159px;">Cantidad total de
 bloques<br>
-      </td>
-      <td style="vertical-align: top; width: 52px;">Costo<br>
-      </td>
-      <td style="vertical-align: top; width: 94px;">Bitcoins que se
+      </th>
+      <th style="vertical-align: top; width: 52px;">Costo<br>
+      </th>
+      <th style="vertical-align: top; width: 94px;">Bitcoins que se
 generaran<br>
-      </td>
-      <td style="vertical-align: top;">Bitcoins en total</td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 159px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 52px;"><br>
-      </td>
-      <td style="vertical-align: top; width: 94px;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
+      </th>
+      <th style="vertical-align: top;">Bitcoins en total</th>
+    </thead>
   </tbody>
 </table>
 
